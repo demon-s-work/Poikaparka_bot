@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poikaparka_bot", "Poikaparka_bot\Poikaparka_bot.csproj", "{09C02308-2E98-4809-B5EF-A5B801B51179}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dal", "Dal\Dal.csproj", "{08B9A5A3-A5F3-4D44-884C-C0E53470BE29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseServices", "BaseServices\BaseServices.csproj", "{9AE24C30-49DD-420A-8E0C-A1A397989FC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{09C02308-2E98-4809-B5EF-A5B801B51179}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09C02308-2E98-4809-B5EF-A5B801B51179}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09C02308-2E98-4809-B5EF-A5B801B51179}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B9A5A3-A5F3-4D44-884C-C0E53470BE29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B9A5A3-A5F3-4D44-884C-C0E53470BE29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B9A5A3-A5F3-4D44-884C-C0E53470BE29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B9A5A3-A5F3-4D44-884C-C0E53470BE29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AE24C30-49DD-420A-8E0C-A1A397989FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE24C30-49DD-420A-8E0C-A1A397989FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE24C30-49DD-420A-8E0C-A1A397989FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE24C30-49DD-420A-8E0C-A1A397989FC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
