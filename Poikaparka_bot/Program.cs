@@ -1,17 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+﻿using EnvironmentService.Response;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Poikaparka.Attributes;
 using Poikaparka.Dal;
-using Poikaparka.Extensions;
-using Poikaparka.HostedServices;
-using Poikaparka.Services;
-using Poikaparka.Settings;
+using Telegram;
+using Telegram.Services;
 
-namespace Poikaparka
+namespace Poikaparka_bot
 {
 	public static class Program
 	{
@@ -23,18 +20,18 @@ namespace Poikaparka
 
 			builder.Configuration.AddEnvironmentVariables("POI_");
 
+			builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection(nameof(TelegramSettings)));
+
 			builder.Services.AddDbContext<ApplicationDbContext>(options => {
 				options.UseMySQL(builder.Configuration.GetConnectionString("Default"));
 			});
 
-			builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection(nameof(TelegramSettings)));
+			builder.Services.AddSingleton<TelegramClientService>();
+			builder.Services.AddHostedService<TelegramService>();
+			builder.Services.AddScoped<CommandHandlerService>();
+			builder.Services.AddScoped<MessageHandlerService>();
 
-			builder.Services.ConfigureBaseServices();
-
-			builder.Services.AddScoped<OperationContext>();
-
-			builder.Services.AddHostedService<TelegramBotService>();
-
+			builder.Services.AddSingleton<ResponseService>();
 			await builder.Build().RunAsync();
 		}
 	}

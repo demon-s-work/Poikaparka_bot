@@ -1,20 +1,22 @@
 ﻿using System.Reflection;
+using BaseServices;
 using Microsoft.Extensions.DependencyInjection;
-using Poikaparka.Abstractions.BaseServices;
+using Microsoft.Extensions.Hosting;
 
-namespace Poikaparka.Extensions
+namespace DI
 {
 	public static class StartupExtensions
 	{
-		public static IServiceCollection ConfigureBaseServices(this IServiceCollection services)
+		public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IHostApplicationBuilder builder)
 		{
 			foreach (var iType in Assembly
-			                      .GetExecutingAssembly()
+			                      .GetEntryAssembly()
 			                      .GetTypes()
 			                      .Where(t => t is { IsClass: true, IsAbstract: false } && t.IsSubclassOf(typeof(BaseService))))
 			{
-				services.AddTransient(iType);
+				services.AddScoped(iType);
 			}
+
 			return services;
 		}
 	}

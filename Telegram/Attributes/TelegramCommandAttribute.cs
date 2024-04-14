@@ -1,4 +1,4 @@
-﻿namespace Poikaparka.Attributes
+﻿namespace Telegram.Attributes
 {
 	[AttributeUsage(AttributeTargets.Method)]
 	public class TelegramCommandAttribute : Attribute

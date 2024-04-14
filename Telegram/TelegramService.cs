@@ -2,51 +2,61 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Poikaparka.Abstractions.BaseServices;
-using Poikaparka.Services;
-using Poikaparka.Settings;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Services;
 
-namespace Poikaparka.HostedServices
+namespace Telegram
 {
-	public class TelegramBotService : LoggedService, IHostedService
+	public class TelegramService : IHostedService
 	{
 		private readonly TelegramSettings _settings;
 		private readonly IServiceScopeFactory _scopeFactory;
-		private TelegramBotClient _telegramBot;
+		private readonly ILogger _logger;
+		private readonly TelegramClientService _clientService;
 
-		public TelegramBotService(ILoggerFactory loggerFactory,
+		public TelegramService(ILoggerFactory loggerFactory,
 		                          IOptions<TelegramSettings> settings,
-		                          IServiceScopeFactory scopeFactory) : base(loggerFactory)
+		                          IServiceScopeFactory scopeFactory,
+		                          TelegramClientService clientService)
 		{
+			_logger = loggerFactory.CreateLogger(GetType().Name);
 			_scopeFactory = scopeFactory;
+			_clientService = clientService;
 			_settings = settings.Value;
-			_telegramBot = new TelegramBotClient(_settings.ApiKey);
+			_clientService = clientService;
 		}
 
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			_telegramBot.StartReceiving(cancellationToken: cancellationToken,
-				updateHandler: UpdateHandler,
+			_clientService.SetClient(InitNewClient());
+		}
+
+		private TelegramBotClient InitNewClient()
+		{
+			var client = new TelegramBotClient(_settings.ApiKey);
+			client.StartReceiving(updateHandler: UpdateHandler,
 				pollingErrorHandler: PollingErrorHandler,
 				receiverOptions: new ReceiverOptions());
+
+			return client;
 		}
 
 		private async Task PollingErrorHandler(ITelegramBotClient client, Exception ex, CancellationToken ct)
 		{
 			_logger.LogError(ex.Message, ex);
+			_logger.LogInformation("Restarting");
+			await _clientService.StopAsync(ct);
+			_clientService.SetClient(InitNewClient());
 		}
 
 		private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken ct)
 		{
 			using var scope = _scopeFactory.CreateScope();
-			var opContext = scope.ServiceProvider.GetService<OperationContext>();
 
-			var bot = await _telegramBot.GetMeAsync(cancellationToken: ct);
-			opContext[ItemNames.BotName] = bot.Username;
+			var bot = await _clientService.GetMeAsync(ct);
 
 			switch (update.Type)
 			{
@@ -54,15 +64,14 @@ namespace Poikaparka.HostedServices
 					break;
 				case UpdateType.Message:
 					var _messageHandler = scope.ServiceProvider.GetService<MessageHandlerService>();
-					_messageHandler.HandleNew(update.Message);
+					await _messageHandler.HandleNew(update.Message, bot.Username);
 					break;
 			}
 		}
 
 		public async Task StopAsync(CancellationToken cancellationToken)
 		{
-			await _telegramBot.CloseAsync(cancellationToken: cancellationToken);
-			_telegramBot = null;
+			await _clientService.StopAsync(cancellationToken);
 		}
 	}
 }

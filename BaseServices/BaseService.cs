@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Poikaparka.Abstractions.BaseServices
+namespace BaseServices
 {
-	public class LoggedService
+	public abstract class BaseService
 	{
 		protected readonly ILogger _logger;
 
-		public LoggedService(ILoggerFactory loggerFactory)
+		public BaseService(ILoggerFactory loggerFactory)
 		{
 			_logger = loggerFactory.CreateLogger(GetType().Name);
 		}
